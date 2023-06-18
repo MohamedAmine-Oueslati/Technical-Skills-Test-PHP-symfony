@@ -1,0 +1,68 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+  Project
+{% endblock %}
+
+{% block body %}
+  <div class="justify-content-center align-items-center d-flex">
+    <div class="card m-5">
+      <div class="row g-0">
+        <div class="col-md-4">
+          <img src="{{ asset('images/' ~ project.filname) }}"
+            class="img-fluid rounded-start"
+            alt="..." />
+        </div>
+        <div class="col-md-8">
+          <div class="card-body">
+            <h5 class="card-title">
+              {{ project.title }}
+            </h5>
+            <p class="card-text">
+              Url : {{ project.url }}
+            </p>
+            <p class="card-text">
+              Status : {{ project.status }}
+            </p>
+            <p class="card-text">
+              Number Of Tasks : {{ project.numberOfTasks }}
+            </p>
+            <p class="card-text">
+              {{ project.description }}
+            </p>
+            <p class="card-text">
+              <small class="text-body-secondary">Last updated 3 mins ago</small>
+            </p>
+            <div class="d-flex">
+              {% if is_granted('ROLE_ADMIN') %}
+                <a href="{{
+                  path(
+                    'app_project_edit',
+                    {
+                      id: project.id
+                    }
+                  )
+                  }}"
+                  class="btn btn-primary m-1">
+                  Edit Project
+                </a>
+                {{
+                  include(
+                    'project/_delete_form.html.twig',
+                    {
+                      id: project.id
+                    }
+                  )
+                }}
+              {% endif %}
+              <a href="{{ path('app_project_index') }}"
+                class="btn btn-primary m-1">
+                Go Back
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
