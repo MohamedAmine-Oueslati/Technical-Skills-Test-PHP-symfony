@@ -8,19 +8,23 @@ use App\Form\ProjectType;
 use App\Form\SearchType;
 use App\Repository\ProjectRepository;
 use App\Manager\ProjectManager;
+use App\Service\MailerService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Mailer\MailerInterface;
 
 #[Route('/project')]
 class ProjectController extends AbstractController
 {
     private $projectManager;
+    private $mailerService;
 
-    public function __construct(ProjectManager $projectManager)
+    public function __construct(ProjectManager $projectManager, MailerService $mailerService)
     {
         $this->projectManager = $projectManager;
+        $this->mailerService = $mailerService;
     }
 
     #[Route('/', name: 'app_project_index', methods: ['GET', 'POST'])]
@@ -71,7 +75,7 @@ class ProjectController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_project_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Project $project, ProjectRepository $projectRepository): Response
+    public function edit(Request $request, Project $project, ProjectRepository $projectRepository, MailerInterface $mailer): Response
     {
         $form = $this->createForm(ProjectType::class, $project);
         $form->handleRequest($request);
@@ -80,6 +84,7 @@ class ProjectController extends AbstractController
 
             $image =  $form->get('image')->getData();
             $project = $this->projectManager->handleImageUpload($project, $image);
+            $this->mailerService->sendEmail($mailer);
 
             $projectRepository->save($project, true);
 
